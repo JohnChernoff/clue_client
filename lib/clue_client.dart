@@ -6,8 +6,9 @@ import 'package:zugclient/zug_client.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart' as cb;
 import 'package:zugclient/zug_fields.dart';
 
+import 'clue_game.dart';
+
 enum ClueMsg { guess, goodGuess, badGuess, newBoard, gameWin, gameLose }
-enum ClueResult {won,lost,playing}
 const fieldBoard = "board";
 const fieldSquare = "square";
 const fieldPiece = "piece";
@@ -18,16 +19,23 @@ const fieldGuessLeft = "guess_left";
 const fieldResult = "result";
 const fieldSqrIdx = "sqr_idx";
 
-class ClueGame extends Area {
-  BoardMatrix? board;
-  int? guessesLeft;
-  ClueResult result = ClueResult.playing;
-  ClueGame(super.data);
-}
-
 class ClueClient extends ZugClient {
 
-  
+  ClueGame get currentGame => currentArea as ClueGame;
+
+  MixStyle _mixStyle = MixStyle.additive;
+  MixStyle get mixStyle => _mixStyle;
+  set mixStyle(MixStyle m) {
+    _mixStyle = m;
+    refreshBoard();
+  }
+
+  bool _simpleSquares = false;
+  bool get simpleSquares => _simpleSquares;
+  set simpleSquares(bool b) {
+    _simpleSquares = b;
+    refreshBoard();
+  }
 
   ClueClient(super.domain, super.port, super.remoteEndpoint, super.prefs, {super.localServer}) { showServMess = true;
     clientName = "clue_client";
@@ -38,8 +46,20 @@ class ClueClient extends ZugClient {
       ClueMsg.badGuess: handleBadGuess,
     });
     checkRedirect(OauthClient("lichess.org",clientName));
-    setPieces(PieceStyle.horsey);
+    loadPieceImages(PieceStyle.horsey);
+  }
 
+  void refreshBoard() {
+    if (currentGame.board != null) {
+      currentGame.board = BoardMatrix(
+        fen: currentGame.board!.fen,
+        width: currentGame.board!.width,
+        height: currentGame.board!.height,
+        imageCallback: imageReady,
+        controlList: currentGame.board!.controlList,
+        mixStyle: mixStyle,
+        simple: simpleSquares);
+    }
   }
 
   @override
@@ -63,16 +83,7 @@ class ClueClient extends ZugClient {
   bool handleUpdateArea(data) { //print("Update: $data");
     Area game = getOrCreateArea(data);
     if (game is ClueGame && game == currentArea) {
-      List<dynamic> controlData = data[fieldBoard][fieldControlList] ?? [];
-      List<ControlTable> table = List.generate(controlData.length, (i) => ControlTable(controlData[i]["wc"],controlData[i]["bc"]));
-      final matrix = BoardMatrix(data[fieldBoard][fieldFEN], 360, 360, imageReady, controlList: table, mixStyle: MixStyle.pigment, simple: true); //, mixStyle: MixStyle.add);
-      List<dynamic> pieceList = data[fieldBoard][fieldPieces] ?? [];
-      for (dynamic piece in pieceList) {
-        matrix.squares[piece[fieldSqrIdx]].piece = Piece.fromChar(piece[fieldPiece]);
-      }
-      game.board = matrix;
-      game.guessesLeft = data[fieldGuessLeft];
-      game.result = parseResult(data[fieldResult]) ?? ClueResult.playing;
+      game.updateGame(data, this);
     }
     return false; //wait for image
   }
@@ -96,7 +107,7 @@ class ClueClient extends ZugClient {
   void handleGoodGuess(data) {
     Area game = getOrCreateArea(data);
     if (game is ClueGame && game == currentArea) {
-      game.board?.squares[data[fieldSquare]].piece = Piece.fromChar(data[fieldPiece]); //slightly redundant now
+      game.addDiscoveredPiece(data[fieldSquare], Piece.fromChar(data[fieldPiece]));
       playClip("ding");
       update();
     }
@@ -134,7 +145,7 @@ class ClueClient extends ZugClient {
     });
   }
 
-  void setPieces(PieceStyle pieceStyle) {
+  void loadPieceImages(PieceStyle pieceStyle) {
     for (PieceType t in PieceType.values) {
       if (t != PieceType.none && t != PieceType.unknown) {
         final wPieceImg = cb.ChessBoard.getPieceImage(pieceStyle.name,t.dartChessType,cb.Color.WHITE);

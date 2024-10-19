@@ -7,6 +7,7 @@ import 'package:zugclient/zug_fields.dart';
 import 'package:zugclient/zug_utils.dart';
 import 'clue_client.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart' as cb;
+import 'clue_game.dart';
 
 class MainPage extends StatefulWidget {
   final ClueClient client;
@@ -37,6 +38,8 @@ class _MainPageState extends State<MainPage> {
           child: Column(
             children: [
               Row(children: [
+                const Text("Simple Squares: "),
+                Checkbox(value: widget.client.simpleSquares, onChanged: (b) => widget.client.simpleSquares = !widget.client.simpleSquares),
                 const Text("Show Control Numbers: "),
                 Checkbox(value: showControl, onChanged: (b) => setState(() => showControl = b ?? false)),
                 Text("Guesses Remaining: ${game.guessesLeft}"),
