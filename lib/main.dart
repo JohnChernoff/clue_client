@@ -1,9 +1,9 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:zug_utils/zug_utils.dart';
 import 'package:zugclient/zug_app.dart';
 import 'package:zugclient/zug_client.dart';
-import 'package:zugclient/zug_utils.dart';
 import 'clue_client.dart';
 import 'main_page.dart';
 
@@ -26,8 +26,11 @@ class ClueApp extends ZugApp {
   ClueApp(super.client, super.appName, {super.key, super.logLevel = Level.INFO, super.noNav = true});
 
   @override
-  Text getAppBarText(ZugClient client, {String? text, Color textColor = Colors.black}) {
-    return Text("Welcome to ClueChess, ${client.userName?.name ?? "Unknown User"}! ");
+  AppBar createAppBar(BuildContext context, ZugClient client, {Widget? txt, Color? color}) {
+    return AppBar(
+      backgroundColor: Colors.black,
+      title: Text("Welcome to ClueChess, ${client.userName?.name ?? "Unknown User"}! ",style: const TextStyle(color: Colors.white)),
+    );
   }
 
   @override

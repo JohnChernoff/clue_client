@@ -1,11 +1,11 @@
 import 'dart:developer';
+import 'package:flutter_oauth/flutter_oauth.dart';
 import 'package:zug_chess/board_matrix.dart';
 import 'package:zug_chess/zug_chess.dart';
-import 'package:zugclient/oauth_client.dart';
+import 'package:zugclient/dialogs.dart';
 import 'package:zugclient/zug_client.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart' as cb;
 import 'package:zugclient/zug_fields.dart';
-
 import 'clue_game.dart';
 
 enum ClueMsg { guess, goodGuess, badGuess, newBoard, gameWin, gameLose }
@@ -21,9 +21,10 @@ const fieldSqrIdx = "sqr_idx";
 
 class ClueClient extends ZugClient {
 
+  bool soundOn = false;
   ClueGame get currentGame => currentArea as ClueGame;
 
-  MixStyle _mixStyle = MixStyle.additive;
+  MixStyle _mixStyle = MixStyle.paint;
   MixStyle get mixStyle => _mixStyle;
   set mixStyle(MixStyle m) {
     _mixStyle = m;
@@ -47,6 +48,15 @@ class ClueClient extends ZugClient {
     });
     checkRedirect(OauthClient("lichess.org",clientName));
     loadPieceImages(PieceStyle.horsey);
+  }
+
+  @override
+  void connected() {
+    Dialogs.confirm("Sound on?").then((b) {
+      soundOn = b;
+      playTrack("clue_chess1");
+    });
+    super.connected();
   }
 
   void refreshBoard() {
@@ -159,7 +169,7 @@ class ClueClient extends ZugClient {
 
   @override
   bool soundCheck() {
-    return true;
+    return soundOn;
   }
 
 }
