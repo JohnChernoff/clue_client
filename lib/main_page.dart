@@ -50,8 +50,9 @@ class _MainPageState extends State<MainPage> {
               children: [
                 getControls(game, boardSize, landscape ? Axis.horizontal : Axis.vertical),
                 Expanded(child: game.result == ClueResult.playing
-                  ? getBoard(game)
-                  : InkWell(child: getBoard(game),onTap: () => widget.client.areaCmd(ClueMsg.newBoard))),
+                  ? getBoard(game,min(800,boardSize))
+                  : InkWell(child: getBoard(game,min(800,boardSize)),
+                    onTap: () => widget.client.areaCmd(ClueMsg.newBoard))),
               ],
             ),
           )
@@ -103,17 +104,17 @@ class _MainPageState extends State<MainPage> {
             ])));
   }
 
-  Widget getBoard(ClueGame game) {
+  Widget getBoard(ClueGame game, double? dialogWidth) {
     BoardMatrix? board = game.board;
     if (board == null) return const SizedBox.shrink();
     return Stack(fit: StackFit.loose, children: [
       getBoardImage(board,game.result),
       if (showControl && game.result == ClueResult.playing) getNumbers(board),
-      getPieces(board, game.result),
+      getPieces(board, game.result, dialogWidth),
     ]);
   }
 
-  Widget getPieces(BoardMatrix board,ClueResult result) {
+  Widget getPieces(BoardMatrix board,ClueResult result,double? dialogWidth) {
     return AspectRatio(aspectRatio: 1.0, child: GridView.count(crossAxisCount: 8, children:
       List.generate(64, (index) {
         final Widget boxChild;
@@ -126,8 +127,8 @@ class _MainPageState extends State<MainPage> {
           Image pieceImg = Image(image: ZugUtils.getAssetImage(p.color == ChessColor.black ? "images/unknownB.png" :"images/unknownW.png"));
           boxChild = result == ClueResult.playing ? InkWell(
             child: pieceImg,
-            onTap: () => ChessDialogs.pieceDialog(p.color == ChessColor.white ? Piece.whitePieces : Piece.blackPieces,context)
-                .then((piece) => widget.client.guessPiece(index,piece?.toLetter() ?? "?")),
+            onTap: () => ChessDialogs.pieceDialog(p.color == ChessColor.white ? Piece.whitePieces : Piece.blackPieces,context,
+                width: dialogWidth).then((piece) => widget.client.guessPiece(index,piece?.toLetter() ?? "?")),
           ) : pieceImg;
         }
         return DecoratedBox(decoration: BoxDecoration(border: Border.all(width: 1)), child: boxChild);
