@@ -90,8 +90,8 @@ class ClueClient extends ZugClient {
   }
 
   @override
-  bool handleUpdateArea(data) { //print("Update: $data");
-    Area game = getOrCreateArea(data);
+  bool handleUpdateArea(data, {Area? clueGame}) { //print("Update: $data");
+    Area game = clueGame ?? getOrCreateArea(data);
     if (game is ClueGame && game == currentArea) {
       game.updateGame(data, this);
     }
@@ -133,19 +133,11 @@ class ClueClient extends ZugClient {
   }
 
   void handleVictory(data) {
-    Area game = getOrCreateArea(data);
-    if (game is ClueGame && game == currentArea) {
-      game.result = ClueResult.won;
-      update();
-    }
+    handleUpdateArea(data);
   }
 
   void handleDefeat(data) {
-    Area game = getOrCreateArea(data);
-    if (game is ClueGame && game == currentArea) {
-      game.result = ClueResult.lost;
-      update();
-    }
+    handleUpdateArea(data);
   }
 
   guessPiece(int sqr, String pieceLetter) {
