@@ -70,13 +70,13 @@ class _MainPageState extends State<MainPage> {
             direction: axis,
             children: [
               DropdownButton<MixStyle>(
-                style: const TextStyle(color: Colors.white), //dropdownColor: Colors.green,
+                style: const TextStyle(color: Colors.black), dropdownColor: Colors.grey,
                 value: widget.client.mixStyle,
                 items: List.generate(
                     MixStyle.values.length,
                     (i) => DropdownMenuItem(
                           value: MixStyle.values.elementAt(i),
-                          child: Text(
+                          child: clueTxt(
                               "Color Mixture Style: ${MixStyle.values.elementAt(i).name}"),
                         )),
                 onChanged: (MixStyle? value) {

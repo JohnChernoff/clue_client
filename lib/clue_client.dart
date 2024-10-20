@@ -24,7 +24,7 @@ class ClueClient extends ZugClient {
   bool soundOn = false;
   ClueGame get currentGame => currentArea as ClueGame;
 
-  MixStyle _mixStyle = MixStyle.paint;
+  MixStyle _mixStyle = MixStyle.light;
   MixStyle get mixStyle => _mixStyle;
   set mixStyle(MixStyle m) {
     _mixStyle = m;
