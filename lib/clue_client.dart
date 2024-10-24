@@ -24,7 +24,6 @@ class ClueClient extends ZugClient {
 
   final tutorialLink = "https://youtu.be/lztP8XD_F9g";
   final int numTracks = 4;
-  bool playingClip = false;
   ClueGame get currentGame => currentArea as ClueGame;
 
   MixStyle _mixStyle = MixStyle.light;
@@ -155,21 +154,14 @@ class ClueClient extends ZugClient {
   }
 
   Future<void> handleVictory(data) async {
-    playingClip = true; update();
-    await playClip("victory")?.future.then((v) {
-      playingClip = false;
-      handleUpdateArea(data);
-    });
+    handleUpdateArea(data);
+    playClip("victory");
 
   }
 
   Future<void> handleDefeat(data) async {
-    playingClip = true; update();
-    playClip("defeat")?.future.then((v) {
-      playingClip = false;
-      handleUpdateArea(data);
-    });
-
+    handleUpdateArea(data);
+    playClip("defeat");
   }
 
   guessPiece(int sqr, String pieceLetter) {
