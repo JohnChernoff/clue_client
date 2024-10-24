@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:clue_client/dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:zug_chess/board_matrix.dart';
 import 'package:zug_chess/dialogs.dart';
@@ -49,7 +50,7 @@ class _MainPageState extends State<MainPage> {
             child: Column(
               children: [
                 getControls(game, boardSize, landscape ? Axis.horizontal : Axis.vertical),
-                Expanded(child: game.result == ClueResult.playing
+                Expanded(child: game.result == ClueResult.playing || widget.client.playingClip
                   ? getBoard(game,min(800,boardSize))
                   : InkWell(child: getBoard(game,min(800,boardSize)),
                     onTap: () => widget.client.areaCmd(ClueMsg.newBoard))),
@@ -101,6 +102,10 @@ class _MainPageState extends State<MainPage> {
               ]),
               pad,
               clueTxt("Guesses Remaining: ${game.guessesLeft}"),
+              pad,
+              IconButton(onPressed: () => showDialog(context: context,
+                  builder: (BuildContext context) => SoundDialog(widget.client, context)),
+                  icon: const Icon(Icons.music_note))
             ])));
   }
 
@@ -125,7 +130,7 @@ class _MainPageState extends State<MainPage> {
           boxChild = cb.ChessBoard.getPieceImage(PieceStyle.horsey.name,p.type.dartChessType,p.color.dartChessColor ?? cb.Color.WHITE);
         } else {
           Image pieceImg = Image(image: ZugUtils.getAssetImage(p.color == ChessColor.black ? "images/unknownB.png" :"images/unknownW.png"));
-          boxChild = result == ClueResult.playing ? InkWell(
+          boxChild = result == ClueResult.playing && !widget.client.playingClip ? InkWell(
             child: pieceImg,
             onTap: () => ChessDialogs.pieceDialog(p.color == ChessColor.white ? Piece.whitePieces : Piece.blackPieces,context,
                 width: dialogWidth).then((piece) => widget.client.guessPiece(index,piece?.toLetter() ?? "?")),
@@ -148,7 +153,8 @@ class _MainPageState extends State<MainPage> {
     return AspectRatio(aspectRatio: 1.0, child:
         result == ClueResult.playing
             ? (board.image != null ? RawImage(fit: BoxFit.cover, image: board.image) : const Text("Loading..."))
-            : Image(image: ZugUtils.getAssetImage("images/clueboard.png"))
+            : Image(image: ZugUtils.getAssetImage(result == ClueResult.won ? "images/winboard.png" : "images/loseboard.png"))
     );
   }
+
 }

@@ -7,6 +7,7 @@ import 'package:zugclient/zug_client.dart';
 import 'clue_client.dart';
 import 'main_page.dart';
 
+//TODO: trim victory/defeat sounds, add async playing
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   ZugUtils.getIniDefaults("cluechess.ini").then((defaults) {

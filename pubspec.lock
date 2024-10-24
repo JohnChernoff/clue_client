@@ -222,7 +222,7 @@ packages:
     source: hosted
     version: "4.0.0"
   flutter_oauth:
-    dependency: "direct main"
+    dependency: transitive
     description:
       path: "C:/Users/jac107/IdeaProjects/flutter/flutter_oauth"
       relative: false

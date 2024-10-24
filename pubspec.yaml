@@ -29,8 +29,6 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
 
-  flutter_oauth:
-    path: "C:/Users/jac107/IdeaProjects/flutter/flutter_oauth"
   zug_utils:
     path: "C:/Users/jac107/IdeaProjects/flutter/zug_utils"
   zugclient:

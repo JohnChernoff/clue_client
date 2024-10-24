@@ -1,8 +1,8 @@
 import 'dart:developer';
-import 'package:flutter_oauth/flutter_oauth.dart';
+import 'dart:math' as math;
 import 'package:zug_chess/board_matrix.dart';
 import 'package:zug_chess/zug_chess.dart';
-import 'package:zugclient/dialogs.dart';
+import 'package:zug_utils/zug_dialogs.dart';
 import 'package:zugclient/zug_client.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart' as cb;
 import 'package:zugclient/zug_fields.dart';
@@ -21,7 +21,8 @@ const fieldSqrIdx = "sqr_idx";
 
 class ClueClient extends ZugClient {
 
-  bool soundOn = false;
+  final int numTracks = 4;
+  bool playingClip = false;
   ClueGame get currentGame => currentArea as ClueGame;
 
   MixStyle _mixStyle = MixStyle.light;
@@ -46,17 +47,41 @@ class ClueClient extends ZugClient {
       ClueMsg.goodGuess: handleGoodGuess,
       ClueMsg.badGuess: handleBadGuess,
     });
-    checkRedirect(OauthClient("lichess.org",clientName));
+    if (prefs?.getBool(AudioType.sound.name) == null) {
+      prefs?.setBool(AudioType.sound.name,true);
+    }
+    checkRedirect("lichess.org");
     loadPieceImages(PieceStyle.horsey);
+
   }
 
   @override
   void connected() {
-    Dialogs.confirm("Sound on?").then((b) {
-      soundOn = b;
-      playTrack("clue_chess1");
-    });
+    if (!(prefs?.getBool(AudioType.music.name) ?? false)) {
+      ZugDialogs.confirm("Sound on?").then((b) {
+        prefs?.setBool(AudioType.music.name,b);
+        playMusic("clue_track_1");
+      });
+    } else {
+      playMusic("clue_track_1");
+    }
     super.connected();
+  }
+
+  void playMusic(String track) {
+    ZugClient.log.info("Playing track: $track");
+    playTrack(track)?.future.then((b) {
+      ZugClient.log.info("Finished track: $track");
+      playMusic(getRndTrack(track));
+    });
+  }
+
+  String getRndTrack(String currentTrack) {
+    String track;
+    do {
+      track = "clue_track_${(math.Random().nextInt(numTracks)+1).toString()}";
+    } while(track == currentTrack);
+    return track;
   }
 
   void refreshBoard() {
@@ -77,8 +102,7 @@ class ClueClient extends ZugClient {
     super.handleAreaList(data);
     List<dynamic> areas = data[fieldAreas];
     bool inGame = false;
-    for (final area in areas) {
-      print("${area[fieldTitle]} - ${userName.toString()}");
+    for (final area in areas) { //print("${area[fieldTitle]} - ${userName.toString()}");
       if (area[fieldTitle] == userName.toString()) {
         inGame = true;
         switchArea(area[fieldTitle]);
@@ -118,7 +142,7 @@ class ClueClient extends ZugClient {
     Area game = getOrCreateArea(data);
     if (game is ClueGame && game == currentArea) {
       game.addDiscoveredPiece(data[fieldSquare], Piece.fromChar(data[fieldPiece]));
-      playClip("ding");
+      playClip("ding",interruptTrack: false);
       update();
     }
   }
@@ -127,17 +151,27 @@ class ClueClient extends ZugClient {
     Area game = getOrCreateArea(data);
     if (game is ClueGame && game == currentArea) {
       game.guessesLeft = data[fieldGuessLeft];
-      playClip("doink");
+      playClip("doink",interruptTrack: false);
       update();
     }
   }
 
-  void handleVictory(data) {
-    handleUpdateArea(data);
+  Future<void> handleVictory(data) async {
+    playingClip = true; update();
+    await playClip("victory")?.future.then((v) {
+      playingClip = false;
+      handleUpdateArea(data);
+    });
+
   }
 
-  void handleDefeat(data) {
-    handleUpdateArea(data);
+  Future<void> handleDefeat(data) async {
+    playingClip = true; update();
+    playClip("defeat")?.future.then((v) {
+      playingClip = false;
+      handleUpdateArea(data);
+    });
+
   }
 
   guessPiece(int sqr, String pieceLetter) {
@@ -157,11 +191,6 @@ class ClueClient extends ZugClient {
       }
     }
     log("Loaded Pieces");
-  }
-
-  @override
-  bool soundCheck() {
-    return soundOn;
   }
 
 }
