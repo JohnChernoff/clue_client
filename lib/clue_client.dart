@@ -1,8 +1,9 @@
 import 'dart:developer';
 import 'dart:math' as math;
+import 'package:clue_client/dialogs.dart';
 import 'package:zug_chess/board_matrix.dart';
 import 'package:zug_chess/zug_chess.dart';
-import 'package:zug_utils/zug_dialogs.dart';
+import 'package:zugclient/zug_app.dart';
 import 'package:zugclient/zug_client.dart';
 import 'package:flutter_chess_board/flutter_chess_board.dart' as cb;
 import 'package:zugclient/zug_fields.dart';
@@ -21,6 +22,7 @@ const fieldSqrIdx = "sqr_idx";
 
 class ClueClient extends ZugClient {
 
+  final tutorialLink = "https://youtu.be/lztP8XD_F9g";
   final int numTracks = 4;
   bool playingClip = false;
   ClueGame get currentGame => currentArea as ClueGame;
@@ -57,14 +59,10 @@ class ClueClient extends ZugClient {
 
   @override
   void connected() {
-    if (!(prefs?.getBool(AudioType.music.name) ?? false)) {
-      ZugDialogs.confirm("Sound on?").then((b) {
-        prefs?.setBool(AudioType.music.name,b);
-        playMusic("clue_track_1");
-      });
-    } else {
+    IntroDialog(zugAppNavigatorKey.currentContext!,tutorialLink).raise().then((b) {
+      prefs?.setBool(AudioType.music.name,b ?? false);
       playMusic("clue_track_1");
-    }
+    });
     super.connected();
   }
 

@@ -1,6 +1,9 @@
 import 'package:clue_client/clue_client.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:zug_utils/zug_utils.dart';
 import 'package:zugclient/zug_client.dart';
+import "package:universal_html/html.dart" as html;
 
 class InfoDialog {
   final BuildContext ctx;
@@ -20,6 +23,43 @@ class InfoDialog {
                     Navigator.pop(context);
                   },
                   child: const Text('OK')),
+            ],
+          );
+        });
+  }
+}
+
+class IntroDialog {
+  String url;
+  final BuildContext ctx;
+
+  IntroDialog(this.ctx,this.url);
+
+  Future<bool?> raise() {
+    return showDialog<bool?>(
+        context: ctx,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            children: [
+              SimpleDialogOption(
+                  onPressed: () {
+                    if (kIsWeb) {
+                      html.window.open(url, 'new tab');
+                    } else {
+                      ZugUtils.launch(url, isNewTab: true);
+                    }
+                  },
+                  child: const Text('Learn ClueChess')),
+              SimpleDialogOption(
+                  onPressed: () {
+                    Navigator.pop(context,false);
+                  },
+                  child: const Text('Start without Music')),
+              SimpleDialogOption(
+                  onPressed: () {
+                    Navigator.pop(context,true);
+                  },
+                  child: const Text('Start with Music')),
             ],
           );
         });
