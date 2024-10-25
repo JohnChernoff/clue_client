@@ -62,7 +62,7 @@ class ClueBoardWidget extends StatelessWidget {
         boxChild = result == ClueResult.playing ? InkWell(
           child: pieceImg,
           onTap: () => ChessDialogs.pieceDialog(p.color == ChessColor.white ? Piece.whitePieces : Piece.blackPieces,context,
-              width: dialogWidth).then((piece) => client.guessPiece(index,piece?.toLetter() ?? "?")),
+              width: dialogWidth, cancelImg: Image(image: ZugUtils.getAssetImage("images/cancel_x.png"))).then((piece) => client.guessPiece(index,piece?.toLetter())),
         ) : pieceImg;
       }
       return DecoratedBox(decoration: BoxDecoration(border: Border.all(width: 1)), child: boxChild);

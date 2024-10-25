@@ -30,26 +30,36 @@ class InfoDialog {
 }
 
 class IntroDialog {
-  String url;
+  String tutorialUrl, discordUrl;
   final BuildContext ctx;
 
-  IntroDialog(this.ctx,this.url);
+  IntroDialog(this.ctx,this.tutorialUrl, this.discordUrl);
 
   Future<bool?> raise() {
     return showDialog<bool?>(
         context: ctx,
         builder: (BuildContext context) {
           return SimpleDialog(
+            title: const Text("Welcome to Cluechess!"),
             children: [
               SimpleDialogOption(
                   onPressed: () {
                     if (kIsWeb) {
-                      html.window.open(url, 'new tab');
+                      html.window.open(tutorialUrl, 'new tab');
                     } else {
-                      ZugUtils.launch(url, isNewTab: true);
+                      ZugUtils.launch(tutorialUrl, isNewTab: true);
                     }
                   },
                   child: const Text('Learn ClueChess')),
+              SimpleDialogOption(
+                  onPressed: () {
+                    if (kIsWeb) {
+                      html.window.open(discordUrl, 'new tab');
+                    } else {
+                      ZugUtils.launch(discordUrl, isNewTab: true);
+                    }
+                  },
+                  child: const Text('Visit Discord')),
               SimpleDialogOption(
                   onPressed: () {
                     Navigator.pop(context,false);

@@ -22,7 +22,8 @@ const fieldSqrIdx = "sqr_idx";
 
 class ClueClient extends ZugClient {
 
-  final tutorialLink = "https://youtu.be/lztP8XD_F9g";
+  final tutorialLink = "https://youtu.be/LXfKUw4ondg";
+  final discoLink = "https://discord.gg/XutMjUD7jY";
   final int numTracks = 4;
   ClueGame get currentGame => currentArea as ClueGame;
 
@@ -58,7 +59,7 @@ class ClueClient extends ZugClient {
 
   @override
   void connected() {
-    IntroDialog(zugAppNavigatorKey.currentContext!,tutorialLink).raise().then((b) {
+    IntroDialog(zugAppNavigatorKey.currentContext!,tutorialLink,discoLink).raise().then((b) {
       prefs?.setBool(AudioType.music.name,b ?? false);
       playMusic("clue_track_1");
     });
@@ -164,11 +165,10 @@ class ClueClient extends ZugClient {
     playClip("defeat");
   }
 
-  guessPiece(int sqr, String pieceLetter) {
-    areaCmd(ClueMsg.guess,data: {
-        fieldSquare : sqr,
-        fieldPiece : pieceLetter
-    });
+  guessPiece(int sqr, String? pieceLetter) {
+    if (pieceLetter != null) {
+      areaCmd(ClueMsg.guess, data: {fieldSquare: sqr, fieldPiece: pieceLetter});
+    }
   }
 
   void loadPieceImages(PieceStyle pieceStyle) {
