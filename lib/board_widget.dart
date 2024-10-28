@@ -13,6 +13,7 @@ class ClueBoardWidget extends StatelessWidget {
   final bool showControl;
   final ClueGame game;
   final double boardSize;
+  final dialWidth = 1000.0;
 
   const ClueBoardWidget(this.client,this.game,this.showControl,this.boardSize,{super.key});
 
@@ -21,8 +22,8 @@ class ClueBoardWidget extends StatelessWidget {
     BoardMatrix? board = game.board;
     if (board == null) return const SizedBox.shrink();
     return game.result == ClueResult.playing
-        ? getBoard(board,context,min(800,boardSize))
-        : InkWell(child: getBoard(board,context,min(800,boardSize)),
+        ? getBoard(board,context,min(dialWidth,boardSize))
+        : InkWell(child: getBoard(board,context,min(dialWidth,boardSize)),
         onTap: () => client.areaCmd(ClueMsg.newBoard));
 
 

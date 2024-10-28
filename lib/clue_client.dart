@@ -9,7 +9,7 @@ import 'package:flutter_chess_board/flutter_chess_board.dart' as cb;
 import 'package:zugclient/zug_fields.dart';
 import 'clue_game.dart';
 
-enum ClueMsg { guess, goodGuess, badGuess, newBoard, gameWin, gameLose }
+enum ClueMsg { guess, goodGuess, badGuess, newBoard, gameWin, gameLose, startUnfixed }
 const fieldBoard = "board";
 const fieldSquare = "square";
 const fieldPiece = "piece";

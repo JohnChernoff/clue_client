@@ -102,9 +102,11 @@ class _MainPageState extends State<MainPage> {
               pad,
               clueTxt("Guesses Remaining: ${game.guessesLeft}"),
               pad,
+              TextButton(onPressed: () => widget.client.areaCmd(ClueMsg.startUnfixed), child: const Text("Start Timer")),
+              pad,
               IconButton(onPressed: () => showDialog(context: context,
                   builder: (BuildContext context) => SoundDialog(widget.client, context)),
-                  icon: const Icon(Icons.music_note))
+                  icon: const Icon(Icons.music_note)),
             ])));
   }
 
