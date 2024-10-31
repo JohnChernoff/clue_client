@@ -29,18 +29,17 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
 
-  zug_utils:
-    path: "C:/Users/jac107/IdeaProjects/flutter/zug_utils"
   zugclient:
-    path: "C:/Users/jac107/IdeaProjects/flutter/zugclient"
+    git: "https://github.com/JohnChernoff/zugclient"
+  zug_utils:
+    git: "https://github.com/JohnChernoff/zug_utils"
   zug_chess:
-    path: "C:/Users/jac107/IdeaProjects/flutter/zug_chess"
+    git: "https://github.com/JohnChernoff/zug_chess"
   flutter_chess_board:
-    path: "C:/Users/jac107/IdeaProjects/flutter/flutter_chess_board"
+    git: "https://github.com/JohnChernoff/flutter_chess_board"
 
   flutter:
     sdk: flutter
-
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

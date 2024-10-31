@@ -41,6 +41,13 @@ class ClueClient extends ZugClient {
     refreshBoard();
   }
 
+  bool _showControl = false;
+  bool get showControl => _showControl;
+  set showControl(bool b) {
+    _showControl = b;
+    refreshBoard();
+  }
+
   ClueClient(super.domain, super.port, super.remoteEndpoint, super.prefs, {super.localServer}) { showServMess = true;
     clientName = "clue_client";
     addFunctions({  //ClueMsg.newBoard: handleNewBoard,

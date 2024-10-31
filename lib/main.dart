@@ -30,7 +30,8 @@ class ClueApp extends ZugApp {
   AppBar createAppBar(BuildContext context, ZugClient client, {Widget? txt, Color? color}) {
     return AppBar(
       backgroundColor: Colors.black,
-      title: Text("Welcome to ClueChess, ${client.userName?.name ?? "Unknown User"}! ",style: const TextStyle(color: Colors.white)),
+      title: Text("Welcome to ClueChess, ${client.userName?.name ?? "Unknown User"}! ",
+          style: const TextStyle(color: Colors.white)),
     );
   }
 

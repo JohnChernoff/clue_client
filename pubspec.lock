@@ -209,9 +209,11 @@ packages:
   flutter_chess_board:
     dependency: "direct main"
     description:
-      path: "C:\\Users\\jac107\\IdeaProjects\\flutter\\flutter_chess_board"
-      relative: false
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "97a2dc70168ba9ff0364e686bd2c81f3bb5626bb"
+      url: "https://github.com/JohnChernoff/flutter_chess_board"
+    source: git
     version: "1.0.1"
   flutter_lints:
     dependency: "direct dev"
@@ -221,13 +223,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
-  flutter_oauth:
-    dependency: transitive
-    description:
-      path: "C:/Users/jac107/IdeaProjects/flutter/flutter_oauth"
-      relative: false
-    source: path
-    version: "0.0.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -790,30 +785,38 @@ packages:
   zug_chess:
     dependency: "direct main"
     description:
-      path: "C:\\Users\\jac107\\IdeaProjects\\flutter\\zug_chess"
-      relative: false
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "587df1525c6b6ab69666140c705ad167f18f058b"
+      url: "https://github.com/JohnChernoff/zug_chess"
+    source: git
     version: "0.0.1"
   zug_net:
     dependency: transitive
     description:
-      path: "C:/Users/jac107/IdeaProjects/flutter/zug_net"
-      relative: false
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: f35a2293c5416677a258aef51a06b426714e83a7
+      url: "https://github.com/JohnChernoff/ZugNetFlutter"
+    source: git
     version: "0.0.1"
   zug_utils:
     dependency: "direct main"
     description:
-      path: "C:\\Users\\jac107\\IdeaProjects\\flutter\\zug_utils"
-      relative: false
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "7bb4d0329e848753faf3520cd9e6f08053c23538"
+      url: "https://github.com/JohnChernoff/zug_utils"
+    source: git
     version: "0.0.1"
   zugclient:
     dependency: "direct main"
     description:
-      path: "C:\\Users\\jac107\\IdeaProjects\\flutter\\zugclient"
-      relative: false
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "6fe6ab599c03863d4ccd92c4709cc17434fd0a7c"
+      url: "https://github.com/JohnChernoff/zugclient"
+    source: git
     version: "0.2.0"
 sdks:
   dart: ">=3.5.2 <4.0.0"

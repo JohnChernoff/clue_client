@@ -10,12 +10,11 @@ import 'package:flutter_chess_board/flutter_chess_board.dart' as cb;
 
 class ClueBoardWidget extends StatelessWidget {
   final ClueClient client;
-  final bool showControl;
   final ClueGame game;
   final double boardSize;
   final dialWidth = 1000.0;
 
-  const ClueBoardWidget(this.client,this.game,this.showControl,this.boardSize,{super.key});
+  const ClueBoardWidget(this.client,this.game,this.boardSize,{super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +31,7 @@ class ClueBoardWidget extends StatelessWidget {
   Widget getBoard(BoardMatrix board, BuildContext context, double dialogWidth) {
     return Stack(fit: StackFit.loose, children: [
       getBoardImage(board, game.result),
-      if (showControl && game.result == ClueResult.playing) getNumbers(board),
+      if (client.showControl && game.result == ClueResult.playing) getNumbers(board),
       getPieces(board, game.result, context, dialogWidth),
     ]);
   }
