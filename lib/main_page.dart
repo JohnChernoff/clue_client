@@ -68,6 +68,9 @@ class _MainPageState extends State<MainPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             direction: axis,
             children: [
+              IconButton(onPressed: () => widget.client.send(ClueMsg.top),
+                  icon: const Icon(Icons.scoreboard),
+              ),
               IconButton(onPressed: () => showDialog<void>(
                   context: context,
                   builder: (BuildContext context) => OptionsDialogWidget(widget.client)),
@@ -76,8 +79,55 @@ class _MainPageState extends State<MainPage> {
               pad,
               clueTxt("Guesses Remaining: ${game.guessesLeft}"),
               pad,
-              TextButton(onPressed: () => widget.client.areaCmd(ClueMsg.startUnfixed), child: const Text("Start Timer")),
+              if (game.toGo > 0) clueTxt("To Go: ${game.toGo}"), //pad,
+              game.isTimed
+                  ? TextButton(
+                  onPressed: () => widget.client.areaCmd(ClueMsg.abortTimer),
+                  child: const Text("Abort Timer"))
+                  : TextButton(
+                  onPressed: () => widget.client.areaCmd(ClueMsg.startUnfixed),
+                  child: const Text("Start Timer")),
+              if (game.countUp != null) ClueTimerWidget(game.countUp!, true),
             ])));
+  }
+
+}
+
+class ClueTimerWidget extends StatefulWidget {
+  final int startSeconds;
+  final bool up;
+
+  const ClueTimerWidget(this.startSeconds,this.up,{super.key});
+
+  @override
+  State<StatefulWidget> createState() => _ClueTimerWidgetState();
+
+}
+
+class _ClueTimerWidgetState extends State<ClueTimerWidget> {
+  int seconds = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    seconds = widget.startSeconds;
+    nextTick();
+  }
+
+  void nextTick() {
+    if (mounted) {
+      if (widget.up) {
+        setState(() => seconds++);
+      } else if (seconds > 0) {
+        setState(() => seconds--);
+      }
+      Future.delayed(const Duration(seconds: 1)).then((v) => nextTick());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text("Seconds: $seconds",style: const TextStyle(color: Colors.amber));
   }
 
 }

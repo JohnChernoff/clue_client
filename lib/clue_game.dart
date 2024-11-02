@@ -10,11 +10,15 @@ class ClueGame extends Area {
   BoardMatrix? _board;
   int? guessesLeft;
   ClueResult result = ClueResult.playing;
+  int toGo = 0;
+  int? countUp, countDown;
+  bool get isTimed => countUp != null || countDown != null;
 
   ClueGame(super.data);
 
   void updateGame(dynamic clueData,ClueClient? client) {
     guessesLeft = clueData[fieldGuessLeft];
+    toGo = clueData[fieldTogo] ?? 0;
     result = parseResult(clueData[fieldResult]) ?? ClueResult.playing;
     List<dynamic> controlData = clueData[fieldBoard][fieldControlList] ?? [];
     List<ControlTable> table = List.generate(controlData.length, (i) => ControlTable(controlData[i]["wc"],controlData[i]["bc"]));
@@ -57,5 +61,11 @@ class ClueGame extends Area {
       if (clueResult.name == result) return clueResult;
     }
     return null;
+  }
+
+  void endTimer() {
+    toGo = 0;
+    countDown = null;
+    countUp = null;
   }
 }

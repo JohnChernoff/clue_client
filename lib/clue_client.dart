@@ -9,7 +9,8 @@ import 'package:flutter_chess_board/flutter_chess_board.dart' as cb;
 import 'package:zugclient/zug_fields.dart';
 import 'clue_game.dart';
 
-enum ClueMsg { guess, goodGuess, badGuess, newBoard, gameWin, gameLose, startUnfixed }
+enum ClueMsg { guess, goodGuess, badGuess, newBoard, gameWin, gameLose,
+  startUnfixed, startFixed, abortTimer, stopUnfixed, stopFixed, top }
 const fieldBoard = "board";
 const fieldSquare = "square";
 const fieldPiece = "piece";
@@ -19,6 +20,9 @@ const fieldControlList = "controlList";
 const fieldGuessLeft = "guess_left";
 const fieldResult = "result";
 const fieldSqrIdx = "sqr_idx";
+const fieldBoards = "boards";
+const fieldTogo = "togo";
+const fieldTimed = "timed";
 
 class ClueClient extends ZugClient {
 
@@ -55,6 +59,9 @@ class ClueClient extends ZugClient {
       ClueMsg.gameLose: handleDefeat,
       ClueMsg.goodGuess: handleGoodGuess,
       ClueMsg.badGuess: handleBadGuess,
+      ClueMsg.startUnfixed : handleCountUp,
+      ClueMsg.stopUnfixed : handleBoardsComplete,
+      ClueMsg.abortTimer : handleAbortTimer,
     });
     if (prefs?.getBool(AudioType.sound.name) == null) {
       prefs?.setBool(AudioType.sound.name,true);
@@ -170,6 +177,32 @@ class ClueClient extends ZugClient {
   Future<void> handleDefeat(data) async {
     handleUpdateArea(data);
     playClip("defeat");
+  }
+
+  void handleCountUp(data) {
+    Area game = getOrCreateArea(data);
+    if (game is ClueGame) {
+      game.countUp = 0;
+      update();
+    }
+  }
+
+  void handleBoardsComplete(data) {
+    InfoDialog(zugAppNavigatorKey.currentContext!,data.toString()).raise();
+    Area game = getOrCreateArea(data);
+    if (game is ClueGame) {
+      game.endTimer();
+      update();
+    }
+  }
+
+  void handleAbortTimer(data) {
+    InfoDialog(zugAppNavigatorKey.currentContext!,data.toString()).raise();
+    Area game = getOrCreateArea(data);
+    if (game is ClueGame) {
+      game.endTimer();
+      update();
+    }
   }
 
   guessPiece(int sqr, String? pieceLetter) {
