@@ -23,6 +23,7 @@ const fieldSqrIdx = "sqr_idx";
 const fieldBoards = "boards";
 const fieldTogo = "togo";
 const fieldTimed = "timed";
+const fieldFixedTime = "fixed_time";
 
 class ClueClient extends ZugClient {
 
@@ -52,6 +53,8 @@ class ClueClient extends ZugClient {
     refreshBoard();
   }
 
+  final defFixedTime = false;
+
   ClueClient(super.domain, super.port, super.remoteEndpoint, super.prefs, {super.localServer}) { showServMess = true;
     clientName = "clue_client";
     addFunctions({  //ClueMsg.newBoard: handleNewBoard,
@@ -60,7 +63,9 @@ class ClueClient extends ZugClient {
       ClueMsg.goodGuess: handleGoodGuess,
       ClueMsg.badGuess: handleBadGuess,
       ClueMsg.startUnfixed : handleCountUp,
-      ClueMsg.stopUnfixed : handleBoardsComplete,
+      ClueMsg.stopUnfixed : handleTimerComplete,
+      ClueMsg.startFixed : handleCountDown,
+      ClueMsg.stopFixed : handleTimerComplete,
       ClueMsg.abortTimer : handleAbortTimer,
       ClueMsg.top : handleTop,
     });
@@ -95,6 +100,10 @@ class ClueClient extends ZugClient {
       track = "clue_track_${(math.Random().nextInt(numTracks)+1).toString()}";
     } while(track == currentTrack);
     return track;
+  }
+
+  bool isFixedTime() {
+    return prefs?.getBool("fixed_time") ?? defFixedTime;
   }
 
   void refreshBoard() {
@@ -188,7 +197,15 @@ class ClueClient extends ZugClient {
     }
   }
 
-  void handleBoardsComplete(data) {
+  void handleCountDown(data) {
+    Area game = getOrCreateArea(data);
+    if (game is ClueGame) {
+      game.countDown = 180; //TODO: get from data
+      update();
+    }
+  }
+
+  void handleTimerComplete(data) {
     InfoDialog(zugAppNavigatorKey.currentContext!,data.toString()).raise();
     Area game = getOrCreateArea(data);
     if (game is ClueGame) {

@@ -68,7 +68,7 @@ class _MainPageState extends State<MainPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             direction: axis,
             children: [
-              IconButton(onPressed: () => widget.client.send(ClueMsg.top),
+              IconButton(onPressed: () => widget.client.send(ClueMsg.top, data: {fieldFixedTime : widget.client.isFixedTime()}),
                   icon: const Icon(Icons.scoreboard),
               ),
               IconButton(onPressed: () => showDialog<void>(
@@ -85,9 +85,11 @@ class _MainPageState extends State<MainPage> {
                   onPressed: () => widget.client.areaCmd(ClueMsg.abortTimer),
                   child: const Text("Abort Timer"))
                   : TextButton(
-                  onPressed: () => widget.client.areaCmd(ClueMsg.startUnfixed),
+                  onPressed: () => widget.client.areaCmd(
+                      widget.client.isFixedTime() ? ClueMsg.startFixed : ClueMsg.startUnfixed),
                   child: const Text("Start Timer")),
-              if (game.countUp != null) ClueTimerWidget(game.countUp!, true),
+              if (game.countUp != null) ClueTimerWidget(game.countUp!, true)
+              else if (game.countDown != null) ClueTimerWidget(game.countDown!, false),
             ])));
   }
 

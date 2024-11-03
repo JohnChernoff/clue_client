@@ -20,6 +20,7 @@ class _OptionsDialogWidgetState extends State<OptionsDialogWidget> {
   MixStyle? mixStyle;
   bool? showControl;
   bool? simpleSquares;
+  bool? fixedTime;
 
   Widget clueTxt(String txt) {
     return Text(txt,style: const TextStyle(color: Colors.black));
@@ -54,6 +55,8 @@ class _OptionsDialogWidgetState extends State<OptionsDialogWidget> {
               value: showControl ?? widget.client.showControl,
               onChanged: (b) => setState(() => widget.client.showControl = showControl = b ?? false))
         ]),
+        checkPref(widget.client,widget.client.isFixedTime() ? "Timer Mode: 3 minutes" : "Timer Mode: 5 boards",
+            "fixed_time",true,onFalse: () => setState(() {}), onTrue: () => setState(() {})),
         checkPref(widget.client,"Sounds",AudioType.sound.name,true,onFalse: () => setState(() {}), onTrue: () => setState(() {})),
         checkPref(widget.client,"Music",AudioType.music.name,true,
             onFalse: () {
@@ -171,18 +174,21 @@ class TopDialog {
     return showDialog<bool?>(
         context: ctx,
         builder: (BuildContext context) {
-          print(data);
-          return DataTable(columns: const [
+          return SimpleDialog(children: [DataTable(columns: const [
                 DataColumn(label: Text("Name")),
                 DataColumn(label: Text("Time")),
                 DataColumn(label: Text("Boards")),
               ], rows: List.generate(data.length, (index) =>
                   DataRow(cells: [
-                    DataCell(Container(color: Colors.white, child: Text(data[index]?["playerName"] ?? "?"))),
-                    DataCell(Text(data[index]?["unfixedTime"]?.toString() ?? "?")),
-                    DataCell(Text(data[index]?["solved"]?.toString() ?? "?")),
+                    DataCell(getCell(data[index]?["playerName"] ?? "?",Colors.white,Colors.black)),
+                    DataCell(getCell(data[index]?["unfixedTime"]?.toString() ?? "?",Colors.white,Colors.black)),
+                    DataCell(getCell(data[index]?["solved"]?.toString() ?? "?",Colors.white,Colors.black)),
                   ])),
-          );
+          )]);
         });
+  }
+
+  Widget getCell(String txt, Color bgCol, Color txtCol) {
+    return Container(color: bgCol, child: Text(txt,style: TextStyle(color: txtCol)));
   }
 }
