@@ -62,6 +62,7 @@ class ClueClient extends ZugClient {
       ClueMsg.startUnfixed : handleCountUp,
       ClueMsg.stopUnfixed : handleBoardsComplete,
       ClueMsg.abortTimer : handleAbortTimer,
+      ClueMsg.top : handleTop,
     });
     if (prefs?.getBool(AudioType.sound.name) == null) {
       prefs?.setBool(AudioType.sound.name,true);
@@ -203,6 +204,10 @@ class ClueClient extends ZugClient {
       game.endTimer();
       update();
     }
+  }
+
+  void handleTop(data) {
+    TopDialog(zugAppNavigatorKey.currentContext!,data["scores"] as List<dynamic>).raise();
   }
 
   guessPiece(int sqr, String? pieceLetter) {

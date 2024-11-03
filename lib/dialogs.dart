@@ -161,3 +161,28 @@ Row checkPref(ClueClient client, String caption, String prefProp, bool defaultVa
     ],
   );
 }
+
+class TopDialog {
+  BuildContext ctx;
+  List<dynamic> data;
+  TopDialog(this.ctx, this.data);
+  
+  Future<bool?> raise() {
+    return showDialog<bool?>(
+        context: ctx,
+        builder: (BuildContext context) {
+          print(data);
+          return DataTable(columns: const [
+                DataColumn(label: Text("Name")),
+                DataColumn(label: Text("Time")),
+                DataColumn(label: Text("Boards")),
+              ], rows: List.generate(data.length, (index) =>
+                  DataRow(cells: [
+                    DataCell(Container(color: Colors.white, child: Text(data[index]?["playerName"] ?? "?"))),
+                    DataCell(Text(data[index]?["unfixedTime"]?.toString() ?? "?")),
+                    DataCell(Text(data[index]?["solved"]?.toString() ?? "?")),
+                  ])),
+          );
+        });
+  }
+}
