@@ -47,7 +47,7 @@ class _MainPageState extends State<MainPage> {
               children: [
                 getControls(game, boardSize, landscape ? Axis.horizontal : Axis.vertical),
                 Expanded(child: AnimatedSwitcher(
-                    duration: Duration(seconds: game.result == ClueResult.playing ? 1 : 5),
+                    duration: Duration(seconds: game.result == ClueResult.playing || game.isTimed ? 1 : 5),
                     child: ClueBoardWidget(widget.client, game, boardSize,
                       key: game.result == ClueResult.playing ? const ValueKey("1") : const ValueKey("2"))),
                 ),
@@ -68,7 +68,7 @@ class _MainPageState extends State<MainPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             direction: axis,
             children: [
-              IconButton(onPressed: () => widget.client.send(ClueMsg.top, data: {fieldFixedTime : widget.client.isFixedTime()}),
+              IconButton(onPressed: () => widget.client.send(ClueMsg.top, data: widget.client.timerMode.toJSON()),
                   icon: const Icon(Icons.scoreboard),
               ),
               IconButton(onPressed: () => showDialog<void>(
@@ -85,8 +85,7 @@ class _MainPageState extends State<MainPage> {
                   onPressed: () => widget.client.areaCmd(ClueMsg.abortTimer),
                   child: const Text("Abort Timer"))
                   : TextButton(
-                  onPressed: () => widget.client.areaCmd(
-                      widget.client.isFixedTime() ? ClueMsg.startFixed : ClueMsg.startUnfixed),
+                  onPressed: () => widget.client.startTimer(widget.client.timerMode),
                   child: const Text("Start Timer")),
               if (game.countUp != null) ClueTimerWidget(game.countUp!, true)
               else if (game.countDown != null) ClueTimerWidget(game.countDown!, false),

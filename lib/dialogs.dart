@@ -17,6 +17,7 @@ class OptionsDialogWidget extends StatefulWidget {
 }
 
 class _OptionsDialogWidgetState extends State<OptionsDialogWidget> {
+  TimerMode? timerMode;
   MixStyle? mixStyle;
   bool? showControl;
   bool? simpleSquares;
@@ -55,8 +56,20 @@ class _OptionsDialogWidgetState extends State<OptionsDialogWidget> {
               value: showControl ?? widget.client.showControl,
               onChanged: (b) => setState(() => widget.client.showControl = showControl = b ?? false))
         ]),
-        checkPref(widget.client,widget.client.isFixedTime() ? "Timer Mode: 3 minutes" : "Timer Mode: 5 boards",
-            "fixed_time",true,onFalse: () => setState(() {}), onTrue: () => setState(() {})),
+        //checkPref(widget.client,widget.client.isFixedTime() ? "Timer Mode: 3 minutes" : "Timer Mode: 5 boards", "fixed_time",true,onFalse: () => setState(() {}), onTrue: () => setState(() {})),
+      DropdownButton<TimerMode>(
+        style: const TextStyle(color: Colors.black), dropdownColor: Colors.grey,
+        value: timerMode ?? widget.client.timerMode,
+        items: List.generate(
+            TimerMode.values.length,
+                (i) => DropdownMenuItem(
+              value: TimerMode.values.elementAt(i),
+              child: clueTxt(
+                  "Timer Mode: ${TimerMode.values.elementAt(i).toString()}"),
+            )),
+        onChanged: (TimerMode? value) =>
+            setState(() => widget.client.timerMode = timerMode = value!),
+      ),
         checkPref(widget.client,"Sounds",AudioType.sound.name,true,onFalse: () => setState(() {}), onTrue: () => setState(() {})),
         checkPref(widget.client,"Music",AudioType.music.name,true,
             onFalse: () {

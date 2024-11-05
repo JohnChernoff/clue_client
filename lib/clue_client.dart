@@ -10,7 +10,32 @@ import 'package:zugclient/zug_fields.dart';
 import 'clue_game.dart';
 
 enum ClueMsg { guess, goodGuess, badGuess, newBoard, gameWin, gameLose,
-  startUnfixed, startFixed, abortTimer, stopUnfixed, stopFixed, top }
+  startTimer, startedUnfixed, startedFixed, abortTimer, stopUnfixed, stopFixed, top, scoreRank }
+
+class TimerData {
+  final int? seconds, boards;
+  const TimerData(this.seconds,this.boards);
+}
+
+enum TimerMode {
+  threeMinutes(TimerData(180,null)),
+  fiveMinutes(TimerData(300,null)),
+  tenMinutes(TimerData(600,null)),
+  threeBoards(TimerData(null,3)),
+  fiveBoards(TimerData(null,5)),
+  twelveBoards(TimerData(null,12));
+  final TimerData timerData;
+  const TimerMode(this.timerData);
+  @override
+  String toString() {
+    return name.substring(0,1).toUpperCase() + name.substring(1);
+  }
+  dynamic toJSON() {
+    if (timerData.seconds != null) return { fieldSeconds : timerData.seconds };
+    if (timerData.boards != null) return { fieldBoards : timerData.boards };
+  }
+}
+
 const fieldBoard = "board";
 const fieldSquare = "square";
 const fieldPiece = "piece";
@@ -21,15 +46,15 @@ const fieldGuessLeft = "guess_left";
 const fieldResult = "result";
 const fieldSqrIdx = "sqr_idx";
 const fieldBoards = "boards";
-const fieldTogo = "togo";
+const fieldSeconds = "seconds";
 const fieldTimed = "timed";
-const fieldFixedTime = "fixed_time";
 
 class ClueClient extends ZugClient {
 
-  final tutorialLink = "https://youtu.be/LXfKUw4ondg";
+  final tutorialLink = "https://youtu.be/HXax_lNH7oU"; //"https://youtu.be/LXfKUw4ondg";
   final discoLink = "https://discord.gg/XutMjUD7jY";
   final int numTracks = 4;
+
   ClueGame get currentGame => currentArea as ClueGame;
 
   MixStyle _mixStyle = MixStyle.light;
@@ -55,6 +80,8 @@ class ClueClient extends ZugClient {
 
   final defFixedTime = false;
 
+  TimerMode timerMode = TimerMode.threeBoards;
+
   ClueClient(super.domain, super.port, super.remoteEndpoint, super.prefs, {super.localServer}) { showServMess = true;
     clientName = "clue_client";
     addFunctions({  //ClueMsg.newBoard: handleNewBoard,
@@ -62,12 +89,13 @@ class ClueClient extends ZugClient {
       ClueMsg.gameLose: handleDefeat,
       ClueMsg.goodGuess: handleGoodGuess,
       ClueMsg.badGuess: handleBadGuess,
-      ClueMsg.startUnfixed : handleCountUp,
+      ClueMsg.startedUnfixed : handleCountUp,
       ClueMsg.stopUnfixed : handleTimerComplete,
-      ClueMsg.startFixed : handleCountDown,
+      ClueMsg.startedFixed : handleCountDown,
       ClueMsg.stopFixed : handleTimerComplete,
       ClueMsg.abortTimer : handleAbortTimer,
       ClueMsg.top : handleTop,
+      ClueMsg.scoreRank : handleScoreRank,
     });
     if (prefs?.getBool(AudioType.sound.name) == null) {
       prefs?.setBool(AudioType.sound.name,true);
@@ -102,9 +130,7 @@ class ClueClient extends ZugClient {
     return track;
   }
 
-  bool isFixedTime() {
-    return prefs?.getBool("fixed_time") ?? defFixedTime;
-  }
+  //bool isFixedTime() { return prefs?.getBool("fixed_time") ?? defFixedTime; }
 
   void refreshBoard() {
     if (currentGame.board != null) {
@@ -200,13 +226,12 @@ class ClueClient extends ZugClient {
   void handleCountDown(data) {
     Area game = getOrCreateArea(data);
     if (game is ClueGame) {
-      game.countDown = 180; //TODO: get from data
+      game.countDown = data[fieldSeconds];
       update();
     }
   }
 
-  void handleTimerComplete(data) {
-    InfoDialog(zugAppNavigatorKey.currentContext!,data.toString()).raise();
+  void handleTimerComplete(data) { //InfoDialog(zugAppNavigatorKey.currentContext!,data.toString()).raise();
     Area game = getOrCreateArea(data);
     if (game is ClueGame) {
       game.endTimer();
@@ -214,8 +239,7 @@ class ClueClient extends ZugClient {
     }
   }
 
-  void handleAbortTimer(data) {
-    InfoDialog(zugAppNavigatorKey.currentContext!,data.toString()).raise();
+  void handleAbortTimer(data) { //InfoDialog(zugAppNavigatorKey.currentContext!,data.toString()).raise();
     Area game = getOrCreateArea(data);
     if (game is ClueGame) {
       game.endTimer();
@@ -227,10 +251,26 @@ class ClueClient extends ZugClient {
     TopDialog(zugAppNavigatorKey.currentContext!,data["scores"] as List<dynamic>).raise();
   }
 
+  void handleScoreRank(data) {
+    InfoDialog(zugAppNavigatorKey.currentContext!,
+        "Your score ranks ${getPlace(data["rank"])} (out of ${data["scores"]})").raise();
+  }
+
+  String getPlace(int i) {
+    if (i == 1) return "first";
+    if (i == 2) return "second";
+    if (i == 3) return "third";
+    return "${i}th";
+  }
+
   guessPiece(int sqr, String? pieceLetter) {
     if (pieceLetter != null) {
       areaCmd(ClueMsg.guess, data: {fieldSquare: sqr, fieldPiece: pieceLetter});
     }
+  }
+
+  startTimer(TimerMode mode) {
+    areaCmd(ClueMsg.startTimer,data: mode.toJSON());
   }
 
   void loadPieceImages(PieceStyle pieceStyle) {

@@ -4,6 +4,7 @@ import 'package:zugclient/zug_client.dart';
 import 'clue_client.dart';
 
 enum ClueResult {won,lost,playing}
+enum DifficultyLevel {easy,medium,hard}
 
 class ClueGame extends Area {
   final Map<int,Piece> _discoveredPieces = {};
@@ -18,7 +19,7 @@ class ClueGame extends Area {
 
   void updateGame(dynamic clueData,ClueClient? client) {
     guessesLeft = clueData[fieldGuessLeft];
-    toGo = clueData[fieldTogo] ?? 0;
+    toGo = clueData[fieldBoards] ?? 0;
     result = parseResult(clueData[fieldResult]) ?? ClueResult.playing;
     List<dynamic> controlData = clueData[fieldBoard][fieldControlList] ?? [];
     List<ControlTable> table = List.generate(controlData.length, (i) => ControlTable(controlData[i]["wc"],controlData[i]["bc"]));
