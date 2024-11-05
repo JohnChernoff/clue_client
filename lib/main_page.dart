@@ -79,14 +79,16 @@ class _MainPageState extends State<MainPage> {
               pad,
               clueTxt("Guesses Remaining: ${game.guessesLeft}"),
               pad,
-              if (game.toGo > 0) clueTxt("To Go: ${game.toGo}"), //pad,
+              if (game.toGo > 0) clueTxt("To Go: ${game.toGo}"),
+              if (game.toGo > 0) pad,
               game.isTimed
-                  ? TextButton(
+                  ? ElevatedButton(
                   onPressed: () => widget.client.areaCmd(ClueMsg.abortTimer),
-                  child: const Text("Abort Timer"))
-                  : TextButton(
+                  child: const Text("Abort Timer",style: TextStyle(color: Colors.black)))
+                  : ElevatedButton(
                   onPressed: () => widget.client.startTimer(widget.client.timerMode),
-                  child: const Text("Start Timer")),
+                  child: const Text("Start Timer",style: TextStyle(color: Colors.black))),
+              pad,
               if (game.countUp != null) ClueTimerWidget(game.countUp!, true)
               else if (game.countDown != null) ClueTimerWidget(game.countDown!, false),
             ])));
